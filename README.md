@@ -1,6 +1,6 @@
 # MediBook
 
-An intelligent medical appointment booking chatbot. Patients chat in natural language to book, check, cancel, or reschedule appointments — no forms or dropdowns for the core booking flow.
+An intelligent medical appointment booking chatbot. Patients chat in natural language to book, check, cancel, or reschedule appointments — no forms or dropdowns for the core booking flow easy and simple
 
 ## Tech Stack
 

@@ -44,7 +44,7 @@ Structured response → React UI
 |-------|-------------|--------|
 | **1** | Database layer (SQLAlchemy models, seed data, slot generation) | Done |
 | **2** | FastAPI skeleton (health, auth, appointment CRUD, slots API) | Done |
-| **3** | LangChain + Groq pipeline (intent, slot extraction, memory) | Pending |
+| **3** | LangChain + Groq pipeline (intent, slot extraction, memory) | Done |
 | **4** | Wire pipeline into `/chat` endpoint | Pending |
 | **5** | React frontend (chat UI, login gate, booking card) | Pending |
 | **6** | Polish (README, tests, error handling) | Pending |
@@ -67,6 +67,16 @@ Structured response → React UI
 - `DELETE /appointments/{id}` — cancel appointment
 - Business logic in `appointment_service.py` (double-booking prevention, past-date validation)
 
+### Stage 3 — LangChain + Groq Pipeline
+
+- `langchain_pipeline/llm.py` — Groq client via `langchain-groq` (`llama-3.1-70b-versatile`)
+- `langchain_pipeline/prompts.py` — intent, slot extraction, and response generation templates
+- `langchain_pipeline/memory.py` — `ConversationBufferMemory` per `session_id` (in-memory dict)
+- `langchain_pipeline/intent_chain.py` — intent classification chain
+- `langchain_pipeline/slot_extraction.py` — slot extraction chain
+- `langchain_pipeline/response_chain.py` — natural language response generation
+- `langchain_pipeline/test_pipeline.py` — standalone test script with sample utterances
+
 ## Project Structure
 
 ```
@@ -84,6 +94,7 @@ medic/
 │   ├── seed_data.py         # Database seeder
 │   ├── verify_db.py         # DB verification script
 │   ├── test_stage2.py       # API smoke tests
+│   ├── langchain_pipeline/  # LangChain + Groq pipeline (Stage 3)
 │   ├── requirements.txt
 │   └── .env.example
 ├── frontend/
@@ -132,6 +143,16 @@ With the server running in another terminal:
 
 ```powershell
 python test_stage2.py
+```
+
+### Test LangChain pipeline (Stage 3)
+
+```powershell
+# Add your Groq API key first
+copy .env.example .env
+# Edit .env and set GROQ_API_KEY=...
+
+python -m langchain_pipeline.test_pipeline
 ```
 
 ## API Endpoints (Stage 2)

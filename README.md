@@ -45,7 +45,7 @@ Structured response → React UI
 | **1** | Database layer (SQLAlchemy models, seed data, slot generation) | Done |
 | **2** | FastAPI skeleton (health, auth, appointment CRUD, slots API) | Done |
 | **3** | LangChain + Groq pipeline (intent, slot extraction, memory) | Done |
-| **4** | Wire pipeline into `/chat` endpoint | Pending |
+| **4** | Wire pipeline into `/chat` endpoint | Done |
 | **5** | React frontend (chat UI, login gate, booking card) | Pending |
 | **6** | Polish (README, tests, error handling) | Pending |
 
@@ -76,6 +76,15 @@ Structured response → React UI
 - `langchain_pipeline/slot_extraction.py` — slot extraction chain
 - `langchain_pipeline/response_chain.py` — natural language response generation
 - `langchain_pipeline/test_pipeline.py` — standalone test script with sample utterances
+
+### Stage 4 — `/chat` Endpoint
+
+- `POST /chat` — accepts `{ patient_id, session_id, message }`
+- Flow: memory → intent → slots → appointment service → NL reply
+- `app/services/chat_service.py` — orchestrates pipeline + business logic
+- `app/utils/date_resolver.py` — resolves "Friday", "tomorrow" to real dates
+- `app/utils/doctor_lookup.py` — fuzzy doctor/department matching + suggestions
+- Returns `{ reply, structured_data, intent }` for frontend booking cards
 
 ## Project Structure
 
@@ -155,7 +164,25 @@ copy .env.example .env
 python -m langchain_pipeline.test_pipeline
 ```
 
-## API Endpoints (Stage 2)
+### Test /chat endpoint (Stage 4)
+
+```powershell
+# Server must be running
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+
+# In another terminal
+python test_stage4.py
+```
+
+Or via PowerShell:
+
+```powershell
+Invoke-RestMethod -Method POST -Uri http://127.0.0.1:8000/chat `
+  -ContentType "application/json" `
+  -Body '{"patient_id":1,"session_id":"demo-1","message":"I want to see a cardiologist this Friday afternoon"}'
+```
+
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -167,6 +194,7 @@ python -m langchain_pipeline.test_pipeline
 | `GET` | `/appointments/{id}` | Get appointment |
 | `PATCH` | `/appointments/{id}` | Reschedule appointment |
 | `DELETE` | `/appointments/{id}` | Cancel appointment |
+| `POST` | `/chat` | Conversational booking (Stage 4) |
 
 ### Example requests (PowerShell)
 

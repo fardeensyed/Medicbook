@@ -24,6 +24,14 @@ def request(method: str, path: str, body: dict | None = None):
 
 
 def main():
+    import datetime
+    # Calculate target date matching next weekday (same logic as seed_data.py)
+    target_date = datetime.date.today() + datetime.timedelta(days=1)
+    while target_date.weekday() >= 5:
+        target_date += datetime.timedelta(days=1)
+    date_str = target_date.strftime('%Y-%m-%d')
+    print(f"Target date for booking test: {date_str}")
+
     print("1. GET /health")
     status, data = request("GET", "/health")
     print(f"   {status} -> {data}")
@@ -43,8 +51,8 @@ def main():
     })
     print(f"   {status} -> {data}")
 
-    print("\n4. GET /appointments/slots?doctor_id=1&date=2026-06-25")
-    status, data = request("GET", "/appointments/slots?doctor_id=1&date=2026-06-25")
+    print(f"\n4. GET /appointments/slots?doctor_id=1&date={date_str}")
+    status, data = request("GET", f"/appointments/slots?doctor_id=1&date={date_str}")
     print(f"   {status} -> slots count: {len(data['doctors'][0]['slots'])}")
 
     print("\n5. POST /appointments (book 11:00 with Dr. Sharma)")
@@ -52,7 +60,7 @@ def main():
         "patient_id": patient_id,
         "doctor_id": 1,
         "department_id": 1,
-        "appointment_date": "2026-06-25",
+        "appointment_date": date_str,
         "appointment_time": "11:00:00",
     })
     print(f"   {status} -> appointment id: {data.get('id')}")
@@ -63,7 +71,7 @@ def main():
         "patient_id": patient_id,
         "doctor_id": 1,
         "department_id": 1,
-        "appointment_date": "2026-06-25",
+        "appointment_date": date_str,
         "appointment_time": "11:00:00",
     })
     print(f"   {status} -> {data}")
@@ -78,8 +86,8 @@ def main():
     status, data = request("DELETE", f"/appointments/{appt_id}")
     print(f"   {status} -> status: {data.get('status')}")
 
-    print("\n9. GET /appointments/slots (14:00 should be free again)")
-    status, data = request("GET", "/appointments/slots?doctor_id=1&date=2026-06-25")
+    print(f"\n9. GET /appointments/slots (14:00 should be free again)")
+    status, data = request("GET", f"/appointments/slots?doctor_id=1&date={date_str}")
     slots = data["doctors"][0]["slots"]
     print(f"   {status} -> 14:00 available: {'14:00:00' in slots}")
 

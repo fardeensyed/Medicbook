@@ -46,3 +46,33 @@ def get_patient(db: Session, patient_id: int) -> Patient:
     if not patient:
         raise PatientNotFoundError(f"Patient {patient_id} not found")
     return patient
+
+
+def register_patient(db: Session, name: str, email_or_phone: str) -> Patient:
+    normalized_contact = email_or_phone.strip().lower()
+    existing = (
+        db.query(Patient)
+        .filter(Patient.email_or_phone == normalized_contact)
+        .first()
+    )
+    if existing:
+        raise ValueError("Patient already registered with this email or phone number")
+
+    patient = Patient(name=name.strip(), email_or_phone=normalized_contact)
+    db.add(patient)
+    db.commit()
+    db.refresh(patient)
+    return patient
+
+
+def login_patient(db: Session, email_or_phone: str) -> Patient:
+    normalized_contact = email_or_phone.strip().lower()
+    patient = (
+        db.query(Patient)
+        .filter(Patient.email_or_phone == normalized_contact)
+        .first()
+    )
+    if not patient:
+        raise PatientNotFoundError(f"Patient with contact '{email_or_phone}' not found")
+    return patient
+

@@ -76,3 +76,32 @@ class ChatResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
+
+
+class LoginRequest(BaseModel):
+    email_or_phone: str = Field(..., min_length=3, max_length=150)
+
+
+class RegisterRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    email_or_phone: str = Field(..., min_length=3, max_length=150)
+
+
+class DepartmentResponse(BaseModel):
+    id: int
+    name: str
+
+    model_config = {"from_attributes": True}
+
+
+class DoctorResponse(BaseModel):
+    id: int
+    name: str
+    department_id: int
+    department_name: str
+    available_days: str
+    available_start_time: time
+    available_end_time: time
+
+    model_config = {"from_attributes": True}
+

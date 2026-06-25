@@ -9,20 +9,20 @@ An intelligent medical appointment booking chatbot. Patients chat in natural lan
 | Backend | FastAPI (Python 3.11+) |
 | LLM orchestration | LangChain (prompt templates, chains, `ConversationBufferMemory`) |
 | LLM inference | Groq API (`llama-3.1-70b-versatile` / `mixtral-8x7b-32768`) via `langchain-groq` |
-| Frontend | React (Vite) — *planned* |
+| Frontend | React (Vite) |
 | Database | SQLite via SQLAlchemy |
 | Auth | Lightweight identity capture (name + email/phone, no passwords/JWT) |
 
 ## Architecture
 
 ```
-Patient (React Chat UI)          [Stage 5 — not yet built]
+Patient (React Chat UI)          [Stage 5 — done]
         │
         ▼
-FastAPI Backend (/chat)          [Stage 4 — not yet built]
+FastAPI Backend (/chat)          [Stage 4 — done]
         │
         ▼
-LangChain Pipeline               [Stage 3 — not yet built]
+LangChain Pipeline               [Stage 3 — done]
   (intent + slot extraction + ConversationBufferMemory)
         │
         ▼
@@ -46,7 +46,7 @@ Structured response → React UI
 | **2** | FastAPI skeleton (health, auth, appointment CRUD, slots API) | Done |
 | **3** | LangChain + Groq pipeline (intent, slot extraction, memory) | Done |
 | **4** | Wire pipeline into `/chat` endpoint | Done |
-| **5** | React frontend (chat UI, login gate, booking card) | Pending |
+| **5** | React frontend (chat UI, login gate, booking card) | Done |
 | **6** | Polish (README, tests, error handling) | Pending |
 
 ### Stage 1 — Database Layer
@@ -86,6 +86,13 @@ Structured response → React UI
 - `app/utils/doctor_lookup.py` — fuzzy doctor/department matching + suggestions
 - Returns `{ reply, structured_data, intent }` for frontend booking cards
 
+### Stage 5 — React Frontend
+
+- `LoginGate.jsx` — name + email/phone form, stores `patient_id` in localStorage
+- `ChatWindow.jsx` — message list, input, calls `/chat`, UUID `session_id` per visit
+- `MessageBubble.jsx` — patient and bot message bubbles
+- `BookingSummaryCard.jsx` — renders booking/slots/cancel/reschedule cards from `structured_data`
+
 ## Project Structure
 
 ```
@@ -107,7 +114,14 @@ medic/
 │   ├── requirements.txt
 │   └── .env.example
 ├── frontend/
-│   ├── package.json         # React/Vite scaffold (Stage 5)
+│   ├── src/
+│   │   ├── components/      # LoginGate, ChatWindow, MessageBubble, BookingSummaryCard
+│   │   ├── api/client.js    # API calls to backend
+│   │   ├── App.jsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── package.json
 │   └── .env.example
 └── .gitignore
 ```
@@ -117,6 +131,7 @@ medic/
 ### Prerequisites
 
 - Python 3.11+
+- Node.js 18+
 - Git
 
 ### Backend
@@ -145,6 +160,23 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 API docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+### Frontend
+
+```powershell
+cd frontend
+
+# Install dependencies (first time only)
+npm install
+
+# Copy environment file
+copy .env.example .env
+
+# Start dev server
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) — the backend must be running on port 8000.
 
 ### Run smoke tests
 

@@ -47,7 +47,9 @@ Structured response → React UI
 | **3** | LangChain + Groq pipeline (intent, slot extraction, memory) | Done |
 | **4** | Wire pipeline into `/chat` endpoint | Done |
 | **5** | React frontend (chat UI, login gate, booking card) | Done |
-| **6** | Polish (README, tests, error handling) | Pending |
+| **6** | Polish (README, tests, error handling) | Done |
+| **7** | Dashboard Layout, Landing Page, Auth Separator & Directory APIs | Done |
+
 
 ### Stage 1 — Database Layer
 
@@ -93,6 +95,14 @@ Structured response → React UI
 - `MessageBubble.jsx` — patient and bot message bubbles
 - `BookingSummaryCard.jsx` — renders booking/slots/cancel/reschedule cards from `structured_data`
 
+### Stage 6 & 7 — Dashboard, Landing Page, and Auth Separator
+
+- **Auth Separator**: Separated authentication into distinct login (validates credentials exist) and registration (prevents account conflicts) screens.
+- **Landing Page (`LandingPage.jsx`)**: Added homepage highlighting key features, public doctors directory with department filtering, inquiry feedback form, and authentication tab selections.
+- **Dashboard (`Dashboard.jsx`)**: Designed main medical control panel displaying stats, active upcoming appointments table with dynamic cancel capabilities, doctor directory, and an interactive slot availability checker.
+- **Floating AI Chatbot Widget (`ChatWindow.jsx` + Floating CSS)**: Renders the chatbot as a collapsible popover balloon in the bottom-right corner of the dashboard. Seamlessly triggers dynamic background updates on the dashboard table whenever appointments are scheduled, rescheduled, or cancelled via conversational commands.
+
+
 ## Project Structure
 
 ```
@@ -115,7 +125,7 @@ medic/
 │   └── .env.example
 ├── frontend/
 │   ├── src/
-│   │   ├── components/      # LoginGate, ChatWindow, MessageBubble, BookingSummaryCard
+│   │   ├── components/      # LandingPage, Dashboard, ChatWindow, MessageBubble, BookingSummaryCard, LoginGate
 │   │   ├── api/client.js    # API calls to backend
 │   │   ├── App.jsx
 │   │   └── index.css
@@ -219,7 +229,12 @@ Invoke-RestMethod -Method POST -Uri http://127.0.0.1:8000/chat `
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/health` | Health check |
-| `POST` | `/auth/identify` | Identify patient `{ name, email_or_phone }` |
+| `POST` | `/auth/identify` | Legacy identify patient `{ name, email_or_phone }` |
+| `POST` | `/auth/login` | Log in patient `{ email_or_phone }` |
+| `POST` | `/auth/register` | Register new patient `{ name, email_or_phone }` |
+| `GET` | `/appointments/doctors` | Get all doctors list with department names and available schedules |
+| `GET` | `/appointments/departments` | Get all departments list |
+| `GET` | `/appointments/patient/{patient_id}` | Get active booked appointments list for a patient |
 | `GET` | `/appointments/slots?doctor_id=&date=` | Available slots for a doctor |
 | `GET` | `/appointments/slots?department_id=&date=` | Available slots for a department |
 | `POST` | `/appointments` | Book appointment |
@@ -227,6 +242,7 @@ Invoke-RestMethod -Method POST -Uri http://127.0.0.1:8000/chat `
 | `PATCH` | `/appointments/{id}` | Reschedule appointment |
 | `DELETE` | `/appointments/{id}` | Cancel appointment |
 | `POST` | `/chat` | Conversational booking (Stage 4) |
+
 
 ### Example requests (PowerShell)
 

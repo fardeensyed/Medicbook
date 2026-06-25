@@ -12,7 +12,7 @@ const WELCOME_MESSAGE = {
   structuredData: null,
 };
 
-export default function ChatWindow({ patient, onLogout }) {
+export default function ChatWindow({ patient, onLogout, onAppointmentChange }) {
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,6 +42,17 @@ export default function ChatWindow({ patient, onLogout }) {
           structuredData: data.structured_data,
         },
       ]);
+
+      // Call callback to trigger dashboard reload when appointment is booked/cancelled/rescheduled
+      if (
+        data.structured_data &&
+        ['booking_confirmation', 'cancellation_confirmation', 'reschedule_confirmation'].includes(
+          data.structured_data.type
+        ) &&
+        onAppointmentChange
+      ) {
+        onAppointmentChange();
+      }
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -63,12 +74,14 @@ export default function ChatWindow({ patient, onLogout }) {
           <div className="brand-icon brand-icon--sm" aria-hidden="true">+</div>
           <div>
             <h1>MediBook</h1>
-            <p>Signed in as {patient.name}</p>
+            <p>MediBook AI Assistant</p>
           </div>
         </div>
-        <button type="button" className="btn-ghost" onClick={onLogout}>
-          Sign out
-        </button>
+        {onLogout && (
+          <button type="button" className="btn-ghost" onClick={onLogout}>
+            Sign out
+          </button>
+        )}
       </header>
 
       <main className="chat-main">

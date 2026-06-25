@@ -36,3 +36,47 @@ export async function sendChat(patientId, sessionId, message) {
     }),
   });
 }
+
+export async function loginPatient(emailOrPhone) {
+  return request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email_or_phone: emailOrPhone }),
+  });
+}
+
+export async function registerPatient(name, emailOrPhone) {
+  return request('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ name, email_or_phone: emailOrPhone }),
+  });
+}
+
+export async function getDoctors() {
+  return request('/appointments/doctors');
+}
+
+export async function getDepartments() {
+  return request('/appointments/departments');
+}
+
+export async function getPatientAppointments(patientId) {
+  return request(`/appointments/patient/${patientId}`);
+}
+
+export async function cancelAppointment(appointmentId) {
+  return request(`/appointments/${appointmentId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function getAvailableSlots(date, doctorId, departmentId) {
+  let url = `/appointments/slots?date=${date}`;
+  if (doctorId) {
+    url += `&doctor_id=${doctorId}`;
+  }
+  if (departmentId) {
+    url += `&department_id=${departmentId}`;
+  }
+  return request(url);
+}
+

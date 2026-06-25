@@ -222,3 +222,19 @@ def get_appointment(db: Session, appointment_id: int) -> AppointmentResponse:
     if not appointment:
         raise AppointmentNotFoundError(appointment_id)
     return _to_response(db, appointment)
+
+
+def list_patient_active_appointments(db: Session, patient_id: int) -> list[AppointmentResponse]:
+    """Return booked or rescheduled appointments for a patient, soonest first."""
+    appointments = (
+        db.query(Appointment)
+        .filter(
+            Appointment.patient_id == patient_id,
+            Appointment.status.in_(
+                [AppointmentStatus.BOOKED, AppointmentStatus.RESCHEDULED]
+            ),
+        )
+        .order_by(Appointment.appointment_date, Appointment.appointment_time)
+        .all()
+    )
+    return [_to_response(db, appt) for appt in appointments]

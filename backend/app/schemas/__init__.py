@@ -62,5 +62,17 @@ class SlotsResponse(BaseModel):
     doctors: list[DoctorSlots]
 
 
+class ChatRequest(BaseModel):
+    patient_id: int
+    session_id: str = Field(..., min_length=1)
+    message: str = Field(..., min_length=1)
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    structured_data: dict | None = None
+    intent: str | None = None
+
+
 class HealthResponse(BaseModel):
     status: str
